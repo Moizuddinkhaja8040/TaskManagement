@@ -1,15 +1,16 @@
 export const environment = {
-    production: false,  
+  production: process.env['production'],
+  
     firebase: {
-    apiKey: "",
-    authDomain: "",
-    projectId: "",
-    storageBucket: "",
-    messagingSenderId: "",
-    appId: ""
+    apiKey: process.env['apiKey'] || "",
+    authDomain: process.env['authDomain'] || "",
+    projectId: process.env['projectId'] || "",
+    storageBucket: process.env['storageBucket'] || "",
+    messagingSenderId: process.env['messagingSenderId'] || "",
+    appId: process.env['appId'] || ""
   },
   supabase: {
-    surl: "",
-    key: ""
+    surl: process.env['surl'] || "",
+    key: process.env['key'] || ""
   }
 };
