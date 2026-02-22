@@ -1,0 +1,20 @@
+.task-card {
+    transition: transform 0.2s;
+
+    &:hover {
+        transform: translateY(-5px);
+    }
+}
+
+.nav-tabs .nav-link {
+    cursor: pointer;
+    color: #6c757d;
+
+    &.active {
+        color: #0d6efd;
+    }
+}
+
+.pointer {
+    cursor: pointer;
+}

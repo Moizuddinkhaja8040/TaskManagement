@@ -1,0 +1,179 @@
+<div class="dashboard">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold">Dashboard</h2>
+            <p class="text-muted mb-0">Overview of your tasks</p>
+        </div>
+        <div class="d-flex gap-2">
+            <button class="btn btn-primary" (click)="navigateToTasks()">
+                <i class="bi bi-plus-lg me-2"></i>New Task
+            </button>
+            <button class="btn btn-outline-secondary" (click)="navigateToTasks()">
+                <i class="bi bi-list-task me-2"></i>All Tasks
+            </button>
+            <button class="btn btn-outline-secondary" (click)="navigateToActivities()">
+                <i class="bi bi-clock-history me-2"></i>Activity Log
+            </button>
+            @if (authService.currentUserProfile()?.roles?.includes('admin')) {
+            <a routerLink="/admin/users" class="btn btn-outline-dark">
+                <i class="bi bi-shield-lock me-2"></i>Admin
+            </a>
+            }
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card stat-card border-0 shadow-sm" [class.active]="activeFilter === 'all'"
+                (click)="setFilter('all')" role="button">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="stat-icon bg-primary bg-opacity-10 text-primary rounded-3 p-3 me-3">
+                            <i class="bi bi-list-task fs-4"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-1">Total Tasks</h6>
+                            <h3 class="mb-0 fw-bold">{{ stats.total }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card stat-card border-0 shadow-sm" [class.active]="activeFilter === 'todo'"
+                (click)="setFilter('todo')" role="button">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="stat-icon bg-warning bg-opacity-10 text-warning rounded-3 p-3 me-3">
+                            <i class="bi bi-clock-history fs-4"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-1">To Do</h6>
+                            <h3 class="mb-0 fw-bold">{{ stats.todo }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card stat-card border-0 shadow-sm" [class.active]="activeFilter === 'in-progress'"
+                (click)="setFilter('in-progress')" role="button">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="stat-icon bg-info bg-opacity-10 text-info rounded-3 p-3 me-3">
+                            <i class="bi bi-arrow-repeat fs-4"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-1">In Progress</h6>
+                            <h3 class="mb-0 fw-bold">{{ stats.inProgress }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card stat-card border-0 shadow-sm" [class.active]="activeFilter === 'completed'"
+                (click)="setFilter('completed')" role="button">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="stat-icon bg-success bg-opacity-10 text-success rounded-3 p-3 me-3">
+                            <i class="bi bi-check-circle fs-4"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-1">Completed</h6>
+                            <h3 class="mb-0 fw-bold">{{ stats.completed }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Tasks by Status</h5>
+                    <div class="chart-container">
+                        <canvas id="statusChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Tasks by Priority</h5>
+                    <div class="chart-container">
+                        <canvas id="priorityChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Tasks -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <h5 class="card-title mb-3">Recent Tasks</h5>
+            @if (getRecentTasks().length > 0) {
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Status</th>
+                            <th>Priority</th>
+                            <th>Due Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (task of getRecentTasks(); track task.id) {
+                        <tr>
+                            <td>{{ task.title }}</td>
+                            <td>
+                                <span class="badge" [ngClass]="{
+                      'bg-warning': task.status === 'todo',
+                      'bg-info': task.status === 'in-progress',
+                      'bg-success': task.status === 'completed'
+                    }">
+                                    {{ task.status }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge" [ngClass]="{
+                      'bg-success': task.priority === 'low',
+                      'bg-warning': task.priority === 'medium',
+                      'bg-danger': task.priority === 'high'
+                    }">
+                                    {{ task.priority }}
+                                </span>
+                            </td>
+                            <td>{{ getTaskDate(task.dueDate) | date: 'short' }}</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-danger" (click)="deleteTask(task.id!)"
+                                    title="Delete task">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            } @else {
+            <div class="text-center py-5 text-muted">
+                <i class="bi bi-inbox fs-1 d-block mb-3"></i>
+                <p>No tasks yet. Create your first task to get started!</p>
+            </div>
+            }
+        </div>
+    </div>
+</div>

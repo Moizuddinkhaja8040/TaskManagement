@@ -1,0 +1,240 @@
+<div class="task-list">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold">Tasks</h2>
+            <p class="text-muted">Manage your tasks</p>
+        </div>
+        <div class="d-flex gap-2">
+            <div class="btn-group" role="group" aria-label="View mode">
+                <button type="button" class="btn btn-outline-secondary" [class.active]="viewMode === 'cards'"
+                    (click)="setViewMode('cards')" title="Card View">
+                    <i class="bi bi-grid-fill"></i>
+                </button>
+                <button type="button" class="btn btn-outline-secondary" [class.active]="viewMode === 'table'"
+                    (click)="setViewMode('table')" title="Table View">
+                    <i class="bi bi-list-ul"></i>
+                </button>
+            </div>
+            <button class="btn btn-primary" (click)="openTaskForm()">
+                <i class="bi bi-plus-circle me-2"></i>New Task
+            </button>
+        </div>
+    </div>
+
+    <!-- Filter Tabs -->
+    <ul class="nav nav-tabs mb-4">
+        <li class="nav-item">
+            <button class="nav-link" [class.active]="activeFilter === 'all'" (click)="setFilter('all')">
+                All Tasks
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" [class.active]="activeFilter === 'todo'" (click)="setFilter('todo')">
+                To Do
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" [class.active]="activeFilter === 'in-progress'" (click)="setFilter('in-progress')">
+                In Progress
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" [class.active]="activeFilter === 'completed'" (click)="setFilter('completed')">
+                Completed
+            </button>
+        </li>
+    </ul>
+
+    <!-- Task Views -->
+    @if (filteredTasks.length > 0) {
+    <!-- Cards View -->
+    @if (viewMode === 'cards') {
+    <div class="row g-4">
+        @for (task of filteredTasks; track task.id) {
+        <div class="col-md-6 col-lg-4">
+            <div class="card task-card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <h5 class="card-title mb-0" style="cursor: pointer;" (click)="openTaskDetail(task)">{{
+                            task.title }}</h5>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-sm btn-outline-primary" (click)="openTaskForm(task)"
+                                title="Edit task">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" (click)="deleteTask(task.id!)"
+                                title="Delete task">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <p class="card-text text-muted mb-3">{{ task.description }}</p>
+
+                    <div class="mb-3 d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="badge me-2" [ngClass]="getStatusClass(task.status)">
+                                {{ task.status }}
+                            </span>
+                            <span class="badge" [ngClass]="getPriorityClass(task.priority)">
+                                {{ task.priority }}
+                            </span>
+                        </div>
+                        <!-- Status Update Dropdown -->
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                Update Status
+                            </button>
+                            <ul class="dropdown-menu shadow">
+                                <li><button class="dropdown-item" (click)="updateTaskStatus(task.id!, 'todo')"
+                                        [disabled]="task.status === 'todo'">To Do</button></li>
+                                <li><button class="dropdown-item" (click)="updateTaskStatus(task.id!, 'in-progress')"
+                                        [disabled]="task.status === 'in-progress'">In Progress</button></li>
+                                <li><button class="dropdown-item" (click)="updateTaskStatus(task.id!, 'completed')"
+                                        [disabled]="task.status === 'completed'">Completed</button></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="mb-3 small">
+                        <span class="text-muted fw-bold">Assigned To:</span>
+                        <span class="ms-1">{{ getAssignedUserNames(task.assignedUserIds) }}</span>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center text-muted small">
+                        <span>
+                            <i class="bi bi-calendar me-1"></i>
+                            {{ getTaskDate(task.dueDate) | date: 'short' }}
+                        </span>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        }
+    </div>
+    }
+
+    <!-- Table View -->
+    @if (viewMode === 'table') {
+    <div class="card border-0 shadow-sm overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0 align-middle">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4">Title</th>
+                        <th>Assigned To</th>
+                        <th>Status</th>
+                        <th>Priority</th>
+                        <th>Due Date</th>
+                        <th class="text-end pe-4">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (task of filteredTasks; track task.id) {
+                    <tr>
+                        <td class="ps-4">
+                            <div class="fw-bold text-primary pointer" (click)="openTaskDetail(task)">
+                                {{ task.title }}
+                            </div>
+                            <div class="small text-muted text-truncate" style="max-width: 300px;">
+                                {{ task.description }}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="small">
+                                {{ getAssignedUserNames(task.assignedUserIds) }}
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge" [ngClass]="getStatusClass(task.status)">
+                                {{ task.status }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge" [ngClass]="getPriorityClass(task.priority)">
+                                {{ task.priority }}
+                            </span>
+                        </td>
+                        <td>
+                            <small class="text-muted">
+                                {{ getTaskDate(task.dueDate) | date: 'shortDate' }}
+                            </small>
+                        </td>
+                        <td class="text-end pe-4">
+                            <div class="d-flex justify-content-end gap-2">
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button"
+                                        data-bs-toggle="dropdown">
+                                        Status
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <!--    <li><button class="dropdown-item"
+                                                (click)="updateTaskStatus(task.id!, 'todo')">To Do</button></li>
+                                        <li><button class="dropdown-item"
+                                                (click)="updateTaskStatus(task.id!, 'in-progress')">In Progress</button>
+                                        </li>
+                                        <li><button class="dropdown-item"
+                                                (click)="updateTaskStatus(task.id!, 'completed')">Completed</button>
+                                        </li> -->
+
+                                        <li><button class="dropdown-item" (click)="updateTaskStatus(task.id!, 'todo')"
+                                                [disabled]="task.status === 'todo'">To Do</button></li>
+                                        <li><button class="dropdown-item"
+                                                (click)="updateTaskStatus(task.id!, 'in-progress')"
+                                                [disabled]="task.status === 'in-progress'">In Progress</button></li>
+                                        <li><button class="dropdown-item"
+                                                (click)="updateTaskStatus(task.id!, 'completed')"
+                                                [disabled]="task.status === 'completed'">Completed</button></li>
+                                    </ul>
+                                </div>
+                                <button class="btn btn-sm btn-outline-primary" (click)="openTaskForm(task)"
+                                    title="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger" (click)="deleteTask(task.id!)"
+                                    title="Delete">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    }
+
+    } @else {
+    <div class="text-center py-5">
+        <i class="bi bi-inbox fs-1 text-muted d-block mb-3"></i>
+        <p class="text-muted">No tasks found. Create your first task!</p>
+    </div>
+    }
+</div>
+
+<!-- Task Form Modal -->
+@if (showTaskForm) {
+<div class="modal show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <app-task-form [task]="editingTask" (taskSaved)="onTaskSaved()"
+                (cancelled)="closeTaskForm()"></app-task-form>
+        </div>
+    </div>
+</div>
+}
+
+<!-- Task Detail Modal -->
+@if (selectedTask) {
+<div class="modal show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <app-task-detail [task]="selectedTask" (closeDetail)="closeTaskDetail()"
+                (editTask)="openTaskForm(selectedTask)"></app-task-detail>
+        </div>
+    </div>
+</div>
+}

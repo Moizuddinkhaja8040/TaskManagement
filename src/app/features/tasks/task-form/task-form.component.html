@@ -1,0 +1,168 @@
+<div class="modal-header">
+    <h5 class="modal-title">{{ task ? 'Edit Task' : 'New Task' }}</h5>
+    <button type="button" class="btn-close" (click)="cancel()" aria-label="Close"></button>
+</div>
+
+<div class="modal-body">
+    @if (errorMessage) {
+    <div class="alert alert-danger" role="alert">
+        <i class="bi bi-exclamation-circle me-2"></i>{{ errorMessage }}
+    </div>
+    }
+
+    <form [formGroup]="taskForm" (ngSubmit)="onSubmit()">
+        <div class="mb-3">
+            <label for="title" class="form-label">Title</label>
+            <input type="text" class="form-control" id="title" formControlName="title" placeholder="Enter task title"
+                [class.is-invalid]="taskForm.get('title')?.invalid && taskForm.get('title')?.touched" />
+            @if (taskForm.get('title')?.invalid && taskForm.get('title')?.touched) {
+            <div class="invalid-feedback">
+                @if (taskForm.get('title')?.errors?.['required']) {
+                Title is required
+                }
+                @if (taskForm.get('title')?.errors?.['minlength']) {
+                Title must be at least 3 characters
+                }
+            </div>
+            }
+        </div>
+
+        <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control" id="description" formControlName="description" rows="3"
+                placeholder="Enter task description"
+                [class.is-invalid]="taskForm.get('description')?.invalid && taskForm.get('description')?.touched"></textarea>
+            @if (taskForm.get('description')?.invalid && taskForm.get('description')?.touched) {
+            <div class="invalid-feedback">
+                Description is required
+            </div>
+            }
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="status" class="form-label">Status</label>
+                <select class="form-select" id="status" formControlName="status">
+                    <option value="todo">To Do</option>
+                    <option value="in-progress">In Progress</option>
+                    <option value="completed">Completed</option>
+                </select>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label for="priority" class="form-label">Priority</label>
+                <select class="form-select" id="priority" formControlName="priority">
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="dueDate" class="form-label">Due Date</label>
+            <input type="datetime-local" class="form-control" id="dueDate" formControlName="dueDate"
+                [class.is-invalid]="taskForm.get('dueDate')?.invalid && taskForm.get('dueDate')?.touched" />
+            @if (taskForm.get('dueDate')?.invalid && taskForm.get('dueDate')?.touched) {
+            <div class="invalid-feedback">
+                Due date is required
+            </div>
+            }
+        </div>
+
+        <!-- Attachments -->
+        <div class="mb-3">
+            <label for="attachments" class="form-label">Attachments</label>
+            <input type="file" class="form-control" id="attachments" multiple (change)="onFileSelected($event)" />
+
+            <!-- Selected Files List -->
+            @if (selectedFiles.length > 0) {
+            <div class="mt-2">
+                <h6 class="text-muted small">Selected for Upload:</h6>
+                <ul class="list-group list-group-flush small">
+                    @for (file of selectedFiles; track file.name; let i = $index) {
+                    <li
+                        class="list-group-item d-flex justify-content-between align-items-center bg-transparent px-0 py-1">
+                        <span><i class="bi bi-file-earmark me-1"></i>{{ file.name }}</span>
+                        <button type="button" class="btn btn-sm btn-link text-danger p-0"
+                            (click)="removeSelectedFile(i)">
+                            <i class="bi bi-x-circle"></i>
+                        </button>
+                    </li>
+                    }
+                </ul>
+            </div>
+            }
+
+            <!-- Existing Attachments List -->
+            @if (existingAttachments.length > 0) {
+            <div class="mt-2">
+                <h6 class="text-muted small">Attached Files:</h6>
+                <ul class="list-group list-group-flush small">
+                    @for (file of existingAttachments; track file.path; let i = $index) {
+                    <li
+                        class="list-group-item d-flex justify-content-between align-items-center bg-transparent px-0 py-1">
+                        <span>
+                            <i class="bi bi-paperclip me-1"></i>
+                            <a [href]="file.url" target="_blank" class="text-decoration-none">{{ file.name }}</a>
+                        </span>
+                        <button type="button" class="btn btn-sm btn-link text-danger p-0"
+                            (click)="removeExistingAttachment(i)">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </li>
+                    }
+                </ul>
+            </div>
+            }
+        </div>
+
+        <div class="mb-4">
+            <label class="form-label d-flex justify-content-between align-items-center">
+                <span>Assign Users</span>
+                <span class="badge bg-secondary-subtle text-secondary border rounded-pill small">
+                    {{ (taskForm.get('assignedUserIds')?.value?.length || 0) }} Selected
+                </span>
+            </label>
+            <p class="text-muted small mb-2">Select non-admin users to assign this task to.</p>
+
+            <div class="user-selection-list border rounded px-2 py-1 bg-light shadow-sm"
+                style="max-height: 150px; overflow-y: auto;">
+                @for (user of assignableUsers$ | async; track user.uid) {
+                <div class="user-item d-flex align-items-center p-2 mb-1 rounded border-bottom-0 pointer transition-all"
+                    [class.selected]="isUserAssigned(user.uid)" (click)="toggleUserAssignment(user.uid)">
+                    <div class="avatar-sm me-2 bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold"
+                        style="width: 28px; height: 28px; font-size: 0.75rem;">
+                        {{ user.displayName.charAt(0).toUpperCase() }}
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="fw-bold small">{{ user.displayName }}</div>
+                    </div>
+                    <div class="form-check m-0">
+                        <input class="form-check-input" type="checkbox" [checked]="isUserAssigned(user.uid)"
+                            (click)="$event.stopPropagation(); toggleUserAssignment(user.uid)">
+                    </div>
+                </div>
+                } @empty {
+                <div class="text-center py-3 text-muted small">
+                    No assignable users found.
+                </div>
+                }
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="cancel()" [disabled]="loading">
+        Cancel
+    </button>
+    <button type="button" class="btn btn-primary" (click)="onSubmit()" [disabled]="loading || taskForm.invalid">
+        @if (loading) {
+        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+        Saving...
+        } @else {
+        {{ task ? 'Update' : 'Create' }} Task
+        }
+    </button>
+</div>

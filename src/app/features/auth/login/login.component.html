@@ -1,0 +1,96 @@
+<div class="login-container">
+  <div class="row g-0 min-vh-100">
+    <!-- Left Side - Login Form -->
+    <div class="col-lg-5 d-flex align-items-center justify-content-center bg-light">
+      <div class="login-form-wrapper p-5">
+        <div class="text-center mb-4">
+          <h1 class="fw-bold mb-2">Task Manager</h1>
+          <p class="text-muted">Sign in to continue</p>
+        </div>
+
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+          @if (errorMessage) {
+            <div class="alert alert-danger" role="alert">
+              <i class="bi bi-exclamation-circle me-2"></i>{{ errorMessage }}
+            </div>
+          }
+
+          <div class="mb-3">
+            <label for="email" class="form-label">Email address</label>
+            <input
+              type="email"
+              class="form-control form-control-lg"
+              id="email"
+              formControlName="email"
+              placeholder="Enter your email"
+              [class.is-invalid]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
+            />
+            @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched) {
+              <div class="invalid-feedback">
+                @if (loginForm.get('email')?.errors?.['required']) {
+                  Email is required
+                }
+                @if (loginForm.get('email')?.errors?.['email']) {
+                  Please enter a valid email
+                }
+              </div>
+            }
+          </div>
+
+          <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input
+              type="password"
+              class="form-control form-control-lg"
+              id="password"
+              formControlName="password"
+              placeholder="Enter your password"
+              [class.is-invalid]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+            />
+            @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
+              <div class="invalid-feedback">
+                @if (loginForm.get('password')?.errors?.['required']) {
+                  Password is required
+                }
+                @if (loginForm.get('password')?.errors?.['minlength']) {
+                  Password must be at least 6 characters
+                }
+              </div>
+            }
+          </div>
+
+          <button
+            type="submit"
+            class="btn btn-primary btn-lg w-100 mb-3"
+            [disabled]="loading || loginForm.invalid"
+          >
+            @if (loading) {
+              <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+              Signing in...
+            } @else {
+              Sign In
+            }
+          </button>
+
+          <div class="text-center">
+            <p class="mb-0">
+              Don't have an account?
+              <a routerLink="/signup" class="text-decoration-none fw-semibold">Sign Up</a>
+            </p>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Right Side - Hero Section -->
+    <div class="col-lg-7 d-none d-lg-flex align-items-center justify-content-center bg-primary text-white p-5">
+      <div class="text-center">
+        <i class="bi bi-check2-circle display-1 mb-4"></i>
+        <h2 class="fw-bold mb-3">Manage Your Tasks Efficiently</h2>
+        <p class="lead">
+          Organize, track, and complete your tasks with our powerful task management system.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

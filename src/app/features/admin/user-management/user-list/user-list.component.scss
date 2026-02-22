@@ -1,0 +1,53 @@
+.avatar {
+    width: 40px;
+    height: 40px;
+    font-size: 1.1rem;
+}
+
+.badge {
+    font-size: 0.75rem;
+    padding: 0.35em 0.75em;
+    font-weight: 500;
+}
+
+.table {
+    th {
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+        padding-top: 1.25rem;
+        padding-bottom: 1.25rem;
+    }
+
+    td {
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+    }
+}
+
+.card {
+    overflow: hidden;
+}
+
+.form-switch {
+    .form-check-input {
+        width: 2.5rem;
+        height: 1.25rem;
+        cursor: pointer;
+
+        &:checked {
+            background-color: #198754;
+            border-color: #198754;
+        }
+    }
+}
+
+.modal-backdrop {
+    z-index: 1050;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal {
+    z-index: 1060;
+    background: transparent;
+}

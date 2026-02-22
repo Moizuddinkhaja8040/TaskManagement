@@ -1,0 +1,31 @@
+.badge {
+    font-size: 0.75rem;
+    padding: 0.35em 0.65em;
+    font-weight: 500;
+}
+
+.table {
+    th {
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+    }
+
+    td {
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+    }
+}
+
+.card {
+    overflow: hidden;
+}
+
+.btn-group {
+    .btn {
+        border-radius: 6px;
+        margin-left: 4px;
+    }
+}

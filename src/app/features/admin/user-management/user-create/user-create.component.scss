@@ -1,0 +1,24 @@
+.role-selection-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.role-option {
+    transition: all 0.2s ease;
+    background-color: var(--bs-body-bg);
+
+    &:hover {
+        background-color: var(--bs-gray-100);
+        border-color: var(--bs-primary) !important;
+    }
+
+    &.active {
+        background-color: rgba(var(--bs-primary-rgb), 0.05);
+        border-color: var(--bs-primary) !important;
+    }
+}
+
+.pointer {
+    cursor: pointer;
+}

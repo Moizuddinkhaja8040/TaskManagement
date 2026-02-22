@@ -1,0 +1,27 @@
+.role-option {
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+        background-color: #f8f9fa;
+        border-color: #dee2e6;
+    }
+
+    &.active {
+        background-color: #f0f7ff;
+        border-color: #0d6efd;
+
+        .form-check-input {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+        }
+    }
+
+    .form-check-input {
+        pointer-events: none;
+    }
+}
+
+.pointer {
+    cursor: pointer;
+}
