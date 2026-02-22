@@ -1,5 +1,4 @@
 export const environment = {
-  production: process.env['production'],
   
     firebase: {
     apiKey: process.env['apiKey'] || "",
