@@ -47,3 +47,7 @@ Thumbs.db
 
 #MD file
 .md
+src/environments/environment.ts
+FIREBASE_SETUP.md
+package-lock.json
+src/environments/environment.ts
